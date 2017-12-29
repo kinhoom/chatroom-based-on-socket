@@ -68,8 +68,8 @@ class WebSocket{
 		        }
 			}else{
 				$bytes = @socket_recv($sk, $buffer, 2048, 0);
-				var_dump($buffer.'hahaha');
-				if($bytes<7){
+				var_dump($bytes.'---bytes');
+				if($bytes<9){
 					//var_dump($bytes);
 					//var_dump((int)$sk);
 					$recv_msg=$this->disconnect($sk);
@@ -81,10 +81,13 @@ class WebSocket{
 						$recv_msg = self::parse($buffer);
 					}
 				}
-				array_unshift($recv_msg, 'receive_msg');
-				var_dump($recv_msg);
-				$msg=self::dealMsg($sk,$recv_msg);
-				$this->broadcast($msg);
+				if(is_array($recv_msg)){
+					array_unshift($recv_msg, 'receive_msg');
+					//var_dump($recv_msg);
+					$msg=self::dealMsg($sk,$recv_msg);
+					$this->broadcast($msg);
+				}
+				
 			}
 		}
 	}
@@ -137,7 +140,7 @@ class WebSocket{
 	            $response['content'] = $msg_content;
 	            break;
 	    }
-	    var_dump($this->build(json_encode($response)).'secondsend!!!');
+	    //var_dump($this->build(json_encode($response)).'secondsend!!!');
 	    return $this->build(json_encode($response));
 	}
 	private function parse($buffer) {
@@ -156,6 +159,7 @@ class WebSocket{
 	        for ($index = 0; $index < strlen($data); $index++) {
 	            $decoded .= $data[$index] ^ $masks[$index % 4];
 	        }
+	        var_dump(json_decode($decoded, true).'kinhoom');
 	        return json_decode($decoded, true);
 	}
 	private function handShake($sk,$buffer){
@@ -241,4 +245,4 @@ class WebSocket{
 	     file_put_contents('./websocket_error.log', implode(' | ', $info) . "\r\n", FILE_APPEND);	
 	}
 }
-$ws = new WebSocket("127.0.0.1", "8089");
+$ws = new WebSocket("192.168.6.107", "8089");
